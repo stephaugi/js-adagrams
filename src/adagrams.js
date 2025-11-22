@@ -13,6 +13,7 @@ export const drawLetters = () => {
 };
 
 const createDrawPool = () => {
+  // initialize table that represents quantity of each letter
   const DRAWTABLE = {A : 9,	N : 6, B : 2,	O : 8, C : 2,	P : 2,
     D : 4, Q : 1, E : 12,	R : 6, F : 2,	S : 4, G : 3,	T : 6,
     H : 2, U : 4, I : 9, V : 2, J : 1, W : 2, K : 1, X : 1,
@@ -38,8 +39,8 @@ const drawTile = drawPool => {
   let selectedTile = drawPool[randNum];
 
   // swaps selected tile with last tile and removes
-  drawPool[randNum] = drawPool[drawPool.length-1];
-  drawPool[drawPool.length-1] = selectedTile;
+  drawPool[randNum] = drawPool[drawPool.length - 1];
+  drawPool[drawPool.length - 1] = selectedTile;
 
   return drawPool.pop();
 };
@@ -84,7 +85,7 @@ const countLetters = (letters) => {
 };
 
 export const scoreWord = (word) => {
-  const SCORETABLE = {'A' : 1, 'E' : 1, 'I' : 1, 'O' : 1, 'L' : 1, 'N' : 1, 'R' : 1,
+  const SCORETABLE = {'A': 1, 'E': 1, 'I': 1, 'O' : 1, 'L' : 1, 'N' : 1, 'R' : 1,
     'S' : 1, 'T' : 1, 'D' : 2, 'G' : 2, 'B' : 3, 'C' : 3, 'M' : 3, 'P' : 3,
     'F' : 4, 'H' : 4, 'V' : 4, 'W' : 4, 'Y' : 4, 'K' : 5, 'J' : 8, 'X' : 8,
     'Q' : 10, 'Z' : 10
@@ -114,9 +115,56 @@ export const scoreWord = (word) => {
 };
 
 export const highestScoreFrom = (words) => {
-  // Implement this method for wave 4
+  // get a list of winners and score
+  const [winners, highscore] = getWinnersAndScores(words);
+  let winner = winners[0];
+
+  if (winners.length > 1) {
+    // applies tieBreaker if there is more than one winner in the list
+    winner = tieBreak(winners);
+  }
+  return {word: winner, score: highscore};
 };
 
-// const lettersInHand = ['D', 'O', 'G', 'L', 'X', 'X', 'X', 'X', 'X', 'X'];
-// usesAvailableLetters('LOOL', lettersInHand);
-scoreWord('');
+const getWinnersAndScores = (words) => {
+  // takes an array of words as input
+  // scores each word and returns list of highest scoring words, and their score
+  // initialize an array for storing winning word(s)
+  let winners = [];
+  let highscore = 0;
+
+  for (const word of words) {
+    // score each word
+    let score = scoreWord(word);
+
+    // if the score is greater than the current high score, replace highscore and word
+    if (score > highscore) {
+      highscore = score;
+      winners = [word];
+
+      // if the score is the same, add to the winners list
+    } else if (score == highscore){
+      winners.push(word);
+    }
+
+  }
+
+  return [winners, highscore];
+};
+
+const tieBreak = (words) => {
+  // initialize shortest word to be the first word
+  let shortest = words[0];
+  for (const word of words) {
+    // return word if it is longer than 10 letters
+    if (word.length == 10) {
+      return word;
+    }
+
+    // otherwise compare the word to the shortest
+    if (word.length < shortest.length) {
+      shortest = word;
+    }
+  }
+  return shortest;
+};
